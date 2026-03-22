@@ -193,6 +193,12 @@
 
         const targetH = TARGET_HEIGHTS[index];
 
+        const triggerScroll = () => {
+            if (index === 1 || index === 2) {
+                setTimeout(() => { window.scrollTo({ top: 320, behavior: 'smooth' }); }, 150);
+            }
+        };
+
         if (!isSwitching) {
             drawerContent.classList.remove('fade-out');
             renderHTML(index, keyName);
@@ -201,10 +207,11 @@
             subDrawer.classList.add('open');
             subDrawer.style.height = targetH + 'px';
 
-            // 【完美修复】：等动画撑开 200ms 后再滚动，确保浏览器没有拦截，稳稳追焦300px
-            if (index === 1 || index === 2) {
-                setTimeout(() => { window.scrollBy({ top: 320, behavior: 'smooth' }); }, 200);
-            }
+            setTimeout(() => {
+                if (index === 1 || index === 2) {
+                    window.scrollTo({ top: 320, behavior: 'smooth' });
+                }
+            }, 200);
         } else {
             const isSameHeight = (prevNav === 1 || prevNav === 2) && (index === 1 || index === 2);
 
@@ -218,6 +225,8 @@
                 }
 
                 drawerContent.classList.remove('fade-out');
+
+                triggerScroll();
             }, 150);
         }
     }
@@ -240,16 +249,16 @@
     }
 
     function renderHTML(index, keyName) {
+        let currentIndex = profiles.findIndex(p => p.id === activeProfileId);
+        if (currentIndex === -1) currentIndex = 0;
+        let p = profiles[currentIndex];
+        let displayNum = '0' + (currentIndex + 1);
+
+        const isPrevDisabled = currentIndex === 0;
+        const isNextDisabled = currentIndex === profiles.length - 1;
+
         let html = '';
         if (index === 0) {
-            let currentIndex = profiles.findIndex(p => p.id === activeProfileId);
-            if (currentIndex === -1) currentIndex = 0;
-            let p = profiles[currentIndex];
-            let displayNum = '0' + (currentIndex + 1);
-
-            const isPrevDisabled = currentIndex === 0;
-            const isNextDisabled = currentIndex === profiles.length - 1;
-
             html = `
                 <div class="h-[120px] flex flex-col justify-center">
                     <div class="flex justify-between items-center mb-6 px-2">
@@ -384,7 +393,40 @@
     function switchNext(e) { if (e) e.stopPropagation(); let idx = profiles.findIndex(p => p.id === activeProfileId); if (idx < profiles.length - 1) { activeProfileId = profiles[idx + 1].id; autoSave(); renderKeyboard(); renderHTML(0); } }
     function editProfileName(id, e) { e.stopPropagation(); const span = document.getElementById(`name-${id}`); if (!span) return; span.contentEditable = "true"; span.focus(); const range = document.createRange(); range.selectNodeContents(span); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); const saveEdit = () => { span.contentEditable = "false"; const newName = span.innerText.trim(); const p = profiles.find(profile => profile.id === id); if (p && newName) { p.name = newName; autoSave(); } else if (p) { span.innerText = p.name; } span.removeEventListener('blur', saveEdit); span.removeEventListener('keydown', keydownHandler); }; const keydownHandler = (event) => { if (event.key === 'Enter') { event.preventDefault(); saveEdit(); } }; span.addEventListener('blur', saveEdit); span.addEventListener('keydown', keydownHandler); }
     function addNewProfile(e) { if (profiles.length >= 5) { alert('配置槽位已满 (Max 5)。请删除后重试。'); return; } const id = 'p_' + Date.now(); profiles.push({ id, name: 'Profile 0' + (profiles.length + 1), layout: JSON.parse(JSON.stringify(RAW_LAYOUT)) }); activeProfileId = id; autoSave(); renderKeyboard(); renderHTML(0); }
-    function triggerImport(e) { if (profiles.length >= 5) { alert('配置槽位已满 (Max 5)。请删除后重试。'); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (readEvent) => { try { const data = JSON.parse(readEvent.target.result); if (data && data.layout) { const newId = 'p_' + Date.now(); profiles.push({ id: newId, name: (data.name || 'Imported Profile'), layout: data.layout }); activeProfileId = newId; autoSave(); renderKeyboard(); renderHTML(0); } } catch(e){} }; reader.readAsText(file); }; input.click(); }
+
+    // 【精准修改 2】：如果当前是 default，则导入必定追加新建配置；只有自定义配置才会被导入的文件替换
+    function triggerImport(e) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (readEvent) => {
+                try {
+                    const data = JSON.parse(readEvent.target.result);
+                    if (data && data.layout) {
+                        if (activeProfileId === 'default') {
+                            if (profiles.length >= 5) { alert('配置槽位已满 (Max 5)。请删除后重试。'); return; }
+                            const newId = 'p_' + Date.now();
+                            profiles.push({ id: newId, name: (data.name || 'Imported Profile'), layout: data.layout });
+                            activeProfileId = newId;
+                        } else {
+                            // 替换当前自定义配置
+                            let p = getActiveProfile();
+                            p.layout = data.layout;
+                            if (data.name) p.name = data.name;
+                        }
+                        autoSave(); renderKeyboard();
+                        if (activeNav === 0) renderHTML(0);
+                    }
+                } catch(e){}
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
 
     function deleteProfile(id, e) {
         e.stopPropagation();
@@ -402,6 +444,7 @@
 
     function downloadProfile(id, e) { e.stopPropagation(); const p = profiles.find(p => p.id === id); const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(p, null, 2)); const a = document.createElement('a'); a.href = data; a.download = (p.name || 'Profile') + ".json"; a.click(); }
 
+    // 【精准修改 3】：改键逻辑修复，使用 return 彻底阻止内层循环溢出
     function applyRemap(val) {
         if (selectedKey) {
             const idx = selectedKey.dataset.index, p = getActiveProfile();
@@ -412,25 +455,26 @@
                         if (count == idx) {
                             lastRemapHistory = { r, c, oldVal: p.layout[r][c], newVal: val, keyEl: selectedKey, profileId: p.id };
                             p.layout[r][c] = val;
-                            break;
+
+                            selectedKey.querySelector('span').innerHTML = val.replace('\n', '<br>');
+                            selectedKey.dataset.name = val.replace('\n', ' ');
+
+                            const targetTitle = document.getElementById('target-key-display');
+                            if (targetTitle) targetTitle.innerText = val.replace('\n', ' ');
+
+                            const undoBtn = document.getElementById('undo-btn');
+                            if (undoBtn) {
+                                undoBtn.classList.remove('opacity-0', 'pointer-events-none');
+                                undoBtn.classList.add('opacity-100');
+                            }
+
+                            autoSave();
+                            return; // 修复点：找到对应键位后，立刻通过 return 终止函数，绝不污染后续按键
                         }
                         count++;
                     }
                 }
             }
-            selectedKey.querySelector('span').innerHTML = val.replace('\n', '<br>');
-            selectedKey.dataset.name = val.replace('\n', ' ');
-
-            const targetTitle = document.getElementById('target-key-display');
-            if (targetTitle) targetTitle.innerText = val.replace('\n', ' ');
-
-            const undoBtn = document.getElementById('undo-btn');
-            if (undoBtn) {
-                undoBtn.classList.remove('opacity-0', 'pointer-events-none');
-                undoBtn.classList.add('opacity-100');
-            }
-
-            autoSave();
         }
     }
 
