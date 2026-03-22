@@ -27,6 +27,7 @@
             background: linear-gradient(135deg, #030405, #0a0c10, #050608, #0a0c10, #030405);
             background-size: 400% 400%;
             animation: flow 20s linear infinite;
+            transition: background 0.5s ease;
         }
         .glass-overlay {
             position: fixed;
@@ -34,6 +35,7 @@
             z-index: -1;
             backdrop-filter: blur(80px) saturate(180%);
             background: rgba(0, 0, 0, 0.3);
+            transition: background 0.5s ease;
         }
 
         @keyframes profile-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -49,6 +51,7 @@
             overflow-y: scroll;
             overflow-anchor: auto;
             -webkit-font-smoothing: antialiased;
+            transition: color 0.3s ease;
         }
         body::-webkit-scrollbar { width: 0px; }
 
@@ -61,9 +64,10 @@
         .custom-slider::-webkit-slider-runnable-track { width: 100%; height: 5px; cursor: pointer; background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
 
         .key-cap { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.45); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; line-height: 1.1; white-space: pre-line !important; cursor: pointer; }
+        .key-cap:hover { box-shadow: 0 0 15px var(--accent); border-color: var(--accent); color: #fff; z-index: 40; }
         .key-selected { background: rgba(59, 130, 246, 0.2) !important; color: #fff !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); z-index: 50; }
 
-        #header-info { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; width: 100%; position: fixed; top: 0; z-index: 150; pointer-events: none; }
+        #header-info { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; width: 100%; position: fixed; top: 0; z-index: 250; }
         .header-hidden { transform: translateY(-110%) !important; opacity: 0 !important; }
 
         #main-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; width: 100%; padding-top: 15vh; padding-bottom: 15vh; box-sizing: border-box; }
@@ -78,7 +82,8 @@
         #dock-bar.appear { opacity: 1; transform: translateY(0); }
         .dock-container { background: var(--glass-bg); backdrop-filter: blur(50px) saturate(180%); border: 1px solid var(--glass-border); padding: 0; border-radius: 1.5rem; display: flex; align-items: stretch; position: relative; z-index: 100; }
         #active-highlight { position: absolute; top: 0; bottom: 0; left: 0; background: rgba(59, 130, 246, 0.15); box-shadow: 0 0 12px rgba(59, 130, 246, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; opacity: 0; transform: scale(0.8); z-index: 0; }
-        .dock-item { transition: color 0.3s ease; color: rgba(255, 255, 255, 0.3); font-size: 11px !important; padding: 16px 40px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; border: none; background: transparent; position: relative; z-index: 10; cursor: pointer; }
+        .dock-item { transition: all 0.3s ease; color: rgba(255, 255, 255, 0.3); font-size: 11px !important; padding: 16px 40px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; border: none; background: transparent; position: relative; z-index: 10; cursor: pointer; }
+        .dock-item:hover { color: #fff; text-shadow: 0 0 10px rgba(59,130,246,0.6); }
         .dock-item.active { color: var(--accent) !important; }
 
         #sub-drawer {
@@ -100,10 +105,44 @@
         #drawer-content.fade-out { opacity: 0; }
 
         .key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; }
-        .key-option { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px 0; text-align: center; font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.5); }
-        .key-option:hover { background: var(--accent); color: #fff; transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .key-option { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px 0; text-align: center; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.5); }
+        .key-option:hover { background: var(--accent); color: #fff !important; transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 
         .profile-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+
+        /* 白天模式 */
+        body.light-mode {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            color: #0f172a;
+        }
+        body.light-mode .bg-flowing {
+            background: linear-gradient(135deg, #e2e8f0, #f8fafc, #cbd5e1, #f1f5f9, #e2e8f0);
+            background-size: 400% 400%;
+        }
+        body.light-mode .glass-overlay { background: rgba(255, 255, 255, 0.3); }
+        body.light-mode .text-white { color: #0f172a !important; }
+        body.light-mode .text-zinc-600 { color: #64748b !important; }
+        body.light-mode .text-zinc-400, body.light-mode .text-zinc-500 { color: #94a3b8 !important; }
+        body.light-mode .bg-zinc-800\/40 { background-color: rgba(0,0,0,0.04) !important; color: #475569 !important;}
+        body.light-mode .border-white\/10, body.light-mode .border-white\/5 { border-color: rgba(0,0,0,0.06) !important; }
+        body.light-mode .bg-white\/5 { background-color: rgba(0,0,0,0.03) !important; }
+        body.light-mode .key-cap { background: rgba(255, 255, 255, 0.9); border: 1px solid #ffffff; border-top: 1px solid rgba(0, 0, 0, 0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04); color: #475569; }
+        body.light-mode .key-cap:hover { background: #fff; color: var(--accent) !important; border-color: var(--accent); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25); }
+        body.light-mode .key-cap.key-selected, body.light-mode .key-cap.key-selected:hover { background: var(--accent) !important; color: #fff !important; border-color: var(--accent); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important; }
+        body.light-mode .key-option { background: rgba(255, 255, 255, 0.8); border: 1px solid #ffffff; color: #475569; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
+        body.light-mode .key-option:hover { background: var(--accent); color: #fff !important; border-color: var(--accent); }
+        body.light-mode .profile-card { background: rgba(255,255,255,0.7); border-color: var(--accent) !important; box-shadow: 0 8px 24px rgba(59,130,246,0.15); }
+        body.light-mode #sub-drawer { box-shadow: 0 25px 60px rgba(0,0,0,0.12), 0 10px 20px rgba(0,0,0,0.05); }
+        body.light-mode #kb-stage { box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        body.light-mode .dock-container { box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        body.light-mode .dock-item { color: #64748b; }
+        body.light-mode .dock-item:hover { color: #0f172a; text-shadow: 0 0 10px #fff; }
+        body.light-mode .dock-item.active { color: var(--accent) !important; text-shadow: none; }
+        body.light-mode .\!text-white { color: #0f172a !important; }
+        body.light-mode .\!bg-blue-500\/10 { background-color: rgba(59,130,246,0.15) !important; border-color: var(--accent) !important; }
+        body.light-mode .custom-slider::-webkit-slider-runnable-track { background: rgba(0, 0, 0, 0.1) !important; }
+        body.light-mode .peer:checked + div { background-color: var(--accent) !important; }
     </style>
 </head>
 <body onclick="resetView()">
@@ -113,17 +152,26 @@
 
 <header id="header-info">
     <div class="flex justify-between items-center pt-8 px-16">
-        <div class="flex items-center gap-6">
-            <h1 class="text-2xl font-black italic uppercase text-white">REZE-80</h1>
+        <div id="header-logo" class="flex items-center gap-6 cursor-pointer group opacity-0 pointer-events-none transition-opacity duration-500" onclick="goBackToEntry()">
+            <h1 class="text-2xl font-black italic uppercase text-white group-hover:text-blue-400 transition-colors">REZE-80</h1>
             <span class="text-[9px] text-zinc-600 font-bold tracking-[0.4em]">80% TKL / POGO TECH</span>
         </div>
-        <div class="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_12px_#3b82f6]"></div>
+
+        <div class="flex items-center gap-6 z-[200] pointer-events-auto h-8">
+            <button onclick="toggleTheme(event)" id="theme-btn" class="w-8 h-8 flex items-center justify-center hover:scale-110 transition-transform text-zinc-400 hover:text-white">
+            </button>
+            <button onclick="toggleLang(event)" id="lang-btn" class="h-8 flex items-center text-[11px] font-bold text-zinc-400 hover:text-white transition-colors tracking-widest leading-none">EN</button>
+            <div class="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_12px_#3b82f6]"></div>
+        </div>
     </div>
 </header>
 
 <div id="entry" class="fixed inset-0 flex flex-col items-center justify-center transition-opacity duration-700 bg-[#030405] z-[200]">
-    <div id="connect-trigger" class="w-56 h-56 rounded-[3.5rem] border-2 border-zinc-800 flex items-center justify-center cursor-pointer hover:border-blue-500 hover:scale-105 transition-all">
-        <span class="text-6xl text-zinc-700 font-extralight">+</span>
+    <div class="flex flex-col items-center">
+        <div id="connect-trigger" class="w-56 h-56 rounded-[3.5rem] border-2 border-zinc-800 flex items-center justify-center cursor-pointer hover:border-blue-500 hover:scale-105 transition-all">
+            <span class="text-6xl text-zinc-700 font-extralight">+</span>
+        </div>
+        <p id="wait-text" class="mt-12 text-sm font-bold tracking-[0.4em] text-zinc-600 uppercase animate-pulse">等待设备连接...</p>
     </div>
 </div>
 
@@ -132,18 +180,51 @@
         <main id="kb-stage"><div id="key-canvas" class="relative"></div></main>
         <nav id="dock-bar" class="dock-container">
             <div id="active-highlight"></div>
-            <button class="dock-item" onclick="handleNav(event, 0)">配置</button>
-            <button class="dock-item" onclick="handleNav(event, 1)">按键</button>
-            <button class="dock-item" onclick="handleNav(event, 2)">灯光</button>
-            <button class="dock-item" onclick="handleNav(event, 3)">信息</button>
+            <button class="dock-item" id="nav-btn-0" onclick="handleNav(event, 0)">配置</button>
+            <button class="dock-item" id="nav-btn-1" onclick="handleNav(event, 1)">按键</button>
+            <button class="dock-item" id="nav-btn-2" onclick="handleNav(event, 2)">灯光</button>
+            <button class="dock-item" id="nav-btn-3" onclick="handleNav(event, 3)">信息</button>
         </nav>
         <div id="sub-drawer" onclick="event.stopPropagation()"><div id="drawer-padding" class="px-10 pt-6 pb-10"><div id="drawer-content"></div></div></div>
     </div>
 </div>
 
 <script>
+    // 线性标志模板
+    const ICON_SUN = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path stroke-linecap="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>`;
+    const ICON_MOON = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
+
     const RAW_LAYOUT = [["Esc",{"x":1},"F1","F2","F3","F4",{"x":0.5},"F5","F6","F7","F8",{"x":0.5},"F9","F10","F11","F12",{"x":0.25},"PrtSc","Scroll Lock","Pause\nBreak"],[{"y":0.5},"~\n`","!\n1","@\n2","#\n3","$\n4","%\n5","^\n6","&\n7","*\n8","(\n9",")\n0","_\n-","+\n=",{"w":2},"Backspace",{"x":0.25},"Insert","Home","PgUp"],[{"w":1.5},"Tab","Q","W","E","R","T","Y","U","I","O","P","{\n[","}\n]",{"w":1.5},"|\n\\",{"x":0.25},"Delete","End","PgDn"],[{"w":1.75},"Caps Lock","A","S","D","F","G","H","J","K","L",":\n;","\"\n'",{"w":2.25},"Enter"],[{"w":2.25},"Shift","Z","X","C","V","B","N","M","<\n,",">\n.","?\n/",{"w":2.75},"Shift",{"x":1.25},"↑"],[{"w":1.25},"Ctrl",{"w":1.25},"Win",{"w":1.25},"Alt",{"a":7,"w":6.25},"",{"a":4,"w":1.25},"Alt",{"w":1.25},"Win",{"w":1.25},"Fn",{"w":1.25},"Ctrl",{"x":0.25},"←","↓","→"]];
     const keyLibrary = { "基础字母": ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"], "数字与符号": ["1","2","3","4","5","6","7","8","9","0","-","=","[","]","\\",";","'",",",".","/","`"], "控制键": ["Esc","Tab","Caps","Shift","Ctrl","Win","Alt","Space","Enter","Back"], "功能区": ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"], "系统键": ["PrtSc","Scroll","Pause","Ins","Home","PgUp","Del","End","PgDn","↑","↓","←","→"] };
+
+    const i18n = {
+        zh: {
+            nav0: "配置", nav1: "按键", nav2: "灯光", nav3: "信息",
+            profMgt: "配置管理", export: "导出", import: "导入", new: "+ 新建", def: "默认", del: "删除",
+            locked: "已锁定", target: "目标按键", undo: "撤销", unsel: "未选择",
+            lightCtrl: "灯光控制", rgbFlow: "全局 RGB 流光", effects: "光效矩阵",
+            l1: "常亮", l2: "呼吸", l3: "波浪", l4: "涟漪", l5: "单点亮", l6: "繁星",
+            bright: "亮度", speed: "速度", palette: "调色板", presets: "快速预设",
+            sysReady: "系统已就绪",
+            lib1: "基础字母", lib2: "数字与符号", lib3: "控制键", lib4: "功能区", lib5: "系统键",
+            alertFull: "配置槽位已满 (Max 5)。请删除后重试。",
+            alertLock: "系统默认配置为出厂设定，已物理锁死，无法修改按键。\n请新建配置 (+ NEW) 进行自定义。",
+            waitConn: "等待设备连接..."
+        },
+        en: {
+            nav0: "CONFIG", nav1: "KEYS", nav2: "LIGHTING", nav3: "INFO",
+            profMgt: "PROFILES MGT", export: "EXPORT", import: "IMPORT", new: "+ NEW", def: "DEFAULT", del: "DELETE",
+            locked: "LOCKED", target: "TARGET KEY", undo: "UNDO", unsel: "UNSELECTED",
+            lightCtrl: "LIGHTING CONTROL", rgbFlow: "GLOBAL RGB FLOW", effects: "EFFECTS MATRIX",
+            l1: "STATIC", l2: "BREATH", l3: "WAVE", l4: "RIPPLE", l5: "REACT", l6: "STARS",
+            bright: "BRIGHTNESS", speed: "SPEED", palette: "CHROMA PALETTE", presets: "QUICK PRESETS",
+            sysReady: "SYSTEM READY",
+            lib1: "LETTERS", lib2: "SYMBOLS", lib3: "MODIFIERS", lib4: "FUNCTIONS", lib5: "SYSTEM",
+            alertFull: "Profile slots full (Max 5). Please delete one and try again.",
+            alertLock: "Default profile is locked.\nPlease create a new profile (+ NEW) to customize.",
+            waitConn: "WAITING FOR CONNECTION..."
+        }
+    };
 
     let profiles = JSON.parse(localStorage.getItem('reze80_profiles'));
     if (!profiles || profiles.length === 0) { profiles = [{ id: 'default', name: 'Default Profile', layout: JSON.parse(JSON.stringify(RAW_LAYOUT)) }]; }
@@ -154,12 +235,66 @@
     let activeNav = -1, selectedKey = null;
     let lastRemapHistory = null;
 
+    let currentLang = localStorage.getItem('reze80_lang') || 'zh';
+    let currentTheme = localStorage.getItem('reze80_theme') || 'dark';
+
     const stageGroup = document.getElementById('stage-group'), subDrawer = document.getElementById('sub-drawer'), drawerContent = document.getElementById('drawer-content'), highlightPill = document.getElementById('active-highlight'), canvas = document.getElementById('key-canvas'), header = document.getElementById('header-info');
+
+    function t(key) { return i18n[currentLang][key] || key; }
 
     function getActiveProfile() { return profiles.find(p => p.id === activeProfileId) || profiles[0]; }
     function autoSave() { localStorage.setItem('reze80_profiles', JSON.stringify(profiles)); localStorage.setItem('reze80_active_id', activeProfileId); }
     function syncHeader() { if (activeNav === -1 && window.scrollY < 5) header.classList.remove('header-hidden'); else header.classList.add('header-hidden'); }
     window.addEventListener('scroll', syncHeader);
+
+    function toggleTheme(e) {
+        if(e) e.stopPropagation();
+        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('reze80_theme', currentTheme);
+        applyThemeAndLang();
+    }
+
+    function toggleLang(e) {
+        if(e) e.stopPropagation();
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        localStorage.setItem('reze80_lang', currentLang);
+        applyThemeAndLang();
+        if(activeNav !== -1) {
+            const keyName = selectedKey ? selectedKey.dataset.name : t('unsel');
+            renderHTML(activeNav, keyName);
+        }
+    }
+
+    function applyThemeAndLang() {
+        const entry = document.getElementById('entry');
+        const themeBtn = document.getElementById('theme-btn');
+        if(currentTheme === 'light') {
+            document.body.classList.add('light-mode');
+            themeBtn.innerHTML = ICON_MOON; // 显示月亮表示点击切到黑夜
+            if(entry) entry.style.backgroundColor = '#f4f4f5';
+        } else {
+            document.body.classList.remove('light-mode');
+            themeBtn.innerHTML = ICON_SUN; // 显示太阳表示点击切到白天
+            if(entry) entry.style.backgroundColor = '#030405';
+        }
+        document.getElementById('lang-btn').innerText = currentLang === 'zh' ? 'EN' : '中';
+        document.getElementById('nav-btn-0').innerText = t('nav0');
+        document.getElementById('nav-btn-1').innerText = t('nav1');
+        document.getElementById('nav-btn-2').innerText = t('nav2');
+        document.getElementById('nav-btn-3').innerText = t('nav3');
+        document.getElementById('wait-text').innerText = t('waitConn');
+    }
+    applyThemeAndLang();
+
+    // 点击 Logo 回退至连接页面逻辑
+    function goBackToEntry() {
+        const entry = document.getElementById('entry');
+        const logo = document.getElementById('header-logo');
+        entry.style.display = 'flex';
+        logo.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => { entry.style.opacity = '1'; }, 10);
+        resetView();
+    }
 
     function toggleLighting(isOn) {
         isLightingOn = isOn;
@@ -189,13 +324,13 @@
         activeNav = index;
         stageGroup.classList.add('stage-active');
         header.classList.add('header-hidden');
-        const keyName = selectedKey ? selectedKey.dataset.name : "未选择";
+        const keyName = selectedKey ? selectedKey.dataset.name : t("unsel");
 
         const targetH = TARGET_HEIGHTS[index];
 
         const triggerScroll = () => {
             if (index === 1 || index === 2) {
-                setTimeout(() => { window.scrollTo({ top: 320, behavior: 'smooth' }); }, 150);
+                setTimeout(() => { window.scrollTo({ top: 320, behavior: 'smooth' }); }, 350);
             }
         };
 
@@ -207,11 +342,7 @@
             subDrawer.classList.add('open');
             subDrawer.style.height = targetH + 'px';
 
-            setTimeout(() => {
-                if (index === 1 || index === 2) {
-                    window.scrollTo({ top: 320, behavior: 'smooth' });
-                }
-            }, 200);
+            triggerScroll();
         } else {
             const isSameHeight = (prevNav === 1 || prevNav === 2) && (index === 1 || index === 2);
 
@@ -226,7 +357,9 @@
 
                 drawerContent.classList.remove('fade-out');
 
-                triggerScroll();
+                if (!isSameHeight) {
+                    triggerScroll();
+                }
             }, 150);
         }
     }
@@ -263,11 +396,11 @@
                 <div class="h-[120px] flex flex-col justify-center">
                     <div class="flex justify-between items-center mb-6 px-2">
                         <div class="flex items-center gap-6">
-                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Profiles MGT</p>
+                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">${t('profMgt')}</p>
                             <div class="flex gap-4">
-                                <button onclick="downloadProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">EXPORT</button>
-                                <button onclick="triggerImport(event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">IMPORT</button>
-                                <button onclick="addNewProfile(event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">+ NEW</button>
+                                <button onclick="downloadProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">${t('export')}</button>
+                                <button onclick="triggerImport(event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">${t('import')}</button>
+                                <button onclick="addNewProfile(event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">${t('new')}</button>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 border border-white/10 group transition-colors hover:bg-white/10 pr-2">
@@ -287,7 +420,7 @@
                                 ${p.id !== 'default' ? `<svg onclick="editProfileName('${p.id}', event)" class="w-3.5 h-3.5 text-zinc-600 hover:text-blue-400 transition-colors cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>` : ''}
                             </div>
                             <div class="flex items-center gap-4">
-                                ${p.id !== 'default' ? `<button onclick="deleteProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-red-500 tracking-wider transition-colors">DELETE</button>` : `<span class="text-[10px] font-bold text-zinc-500 tracking-wider select-none bg-zinc-800/40 px-2.5 py-1 rounded-md border border-white/5">DEFAULT</span>`}
+                                ${p.id !== 'default' ? `<button onclick="deleteProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-red-500 tracking-wider transition-colors">${t('del')}</button>` : `<span class="text-[10px] font-bold text-zinc-500 tracking-wider select-none bg-zinc-800/40 px-2.5 py-1 rounded-md border border-white/5">${t('def')}</span>`}
                             </div>
                         </div>
                     </div>
@@ -298,14 +431,18 @@
                 <div class="h-[420px] flex flex-col">
                     <div class="mb-6 px-2 flex justify-between items-center shrink-0">
                         <div>
-                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Target Key</p>
+                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">${t('target')}</p>
                             <h2 id="target-key-display" class="text-2xl font-black text-white mt-1">${keyName}</h2>
                         </div>
-                        <button id="undo-btn" onclick="undoRemap(event)" class="opacity-0 pointer-events-none text-[10px] font-bold text-zinc-400 hover:text-white transition-all bg-white/5 px-3 py-1.5 rounded-full border border-white/10">UNDO</button>
+                        ${p.id === 'default'
+                ? `<span class="text-[10px] font-bold text-red-500/80 tracking-wider select-none bg-red-500/10 px-2.5 py-1 rounded-md border border-red-500/20">${t('locked')}</span>`
+                : `<button id="undo-btn" onclick="undoRemap(event)" class="opacity-0 pointer-events-none text-[10px] font-bold text-zinc-400 hover:text-white transition-all bg-white/5 px-3 py-1.5 rounded-full border border-white/10">${t('undo')}</button>`
+            }
                     </div>
                     <div class="overflow-y-auto pr-3 flex-1 custom-scrollbar" style="margin-right: -12px;">
                         `;
-            for (let g in keyLibrary) { html += `<div class="mb-6"><p class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest mb-3 px-1">${g}</p><div class="key-grid">${keyLibrary[g].map(k => `<div class="key-option" onclick="applyRemap('${k}')">${k}</div>`).join('')}</div></div>`; }
+            const dictMap = { "基础字母": "lib1", "数字与符号": "lib2", "控制键": "lib3", "功能区": "lib4", "系统键": "lib5" };
+            for (let g in keyLibrary) { html += `<div class="mb-6"><p class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest mb-3 px-1">${t(dictMap[g])}</p><div class="key-grid">${keyLibrary[g].map(k => `<div class="key-option" onclick="applyRemap('${k}')">${k}</div>`).join('')}</div></div>`; }
             html += `
                     </div>
                 </div>`;
@@ -316,39 +453,39 @@
                 <div class="h-[420px] flex flex-col">
                     <div class="mb-8 px-2 flex justify-between items-center pr-3 shrink-0">
                         <div class="flex items-center gap-6">
-                            <p class="text-[11px] font-black text-blue-500 uppercase tracking-widest">Lighting Control</p>
-                            <span class="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em]">Global RGB Flow</span>
+                            <p class="text-[11px] font-black text-blue-500 uppercase tracking-widest">${t('lightCtrl')}</p>
+                            <span class="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em]">${t('rgbFlow')}</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer group scale-110">
                             <input type="checkbox" class="sr-only peer" ${toggleState} onchange="toggleLighting(this.checked)">
-                            <div class="w-10 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[18px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-zinc-400 peer-checked:after:bg-white after:border-zinc-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500/50 peer-checked:border-blue-500 border border-white/10 group-hover:border-white/30 transition-colors"></div>
+                            <div class="w-10 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[18px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-zinc-400 peer-checked:after:bg-white after:border-zinc-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500/80 peer-checked:border-blue-500 border border-white/10 group-hover:border-white/30 transition-colors"></div>
                         </label>
                     </div>
 
                     <div id="lighting-controls" class="flex px-2 gap-16 flex-1 transition-all duration-500 ${stateClass}">
                         <div class="w-[380px] flex-shrink-0">
                             <div class="mb-10">
-                                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Effects Matrix</p>
+                                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">${t('effects')}</p>
                                 <div class="grid grid-cols-3 gap-3">
-                                    <div class="key-option !py-3.5 !text-[10px] !border-blue-500 !bg-blue-500/10 !text-white !shadow-[0_0_20px_rgba(59,130,246,0.3)]">Static</div>
-                                    <div class="key-option !py-3.5 !text-[10px]">Breath</div>
-                                    <div class="key-option !py-3.5 !text-[10px]">Wave</div>
-                                    <div class="key-option !py-3.5 !text-[10px]">Ripple</div>
-                                    <div class="key-option !py-3.5 !text-[10px]">React</div>
-                                    <div class="key-option !py-3.5 !text-[10px]">Stars</div>
+                                    <div class="key-option !py-3.5 !border-blue-500 !bg-blue-500/10 !text-white !shadow-[0_0_20px_rgba(59,130,246,0.3)]">${t('l1')}</div>
+                                    <div class="key-option !py-3.5">${t('l2')}</div>
+                                    <div class="key-option !py-3.5">${t('l3')}</div>
+                                    <div class="key-option !py-3.5">${t('l4')}</div>
+                                    <div class="key-option !py-3.5">${t('l5')}</div>
+                                    <div class="key-option !py-3.5">${t('l6')}</div>
                                 </div>
                             </div>
                             <div class="flex flex-col gap-8 w-full">
                                 <div>
                                     <div class="flex justify-between items-center mb-3">
-                                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Brightness</p>
+                                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">${t('bright')}</p>
                                         <span class="text-[10px] font-black text-white">100%</span>
                                     </div>
                                     <input type="range" min="0" max="100" value="100" class="w-full custom-slider">
                                 </div>
                                 <div>
                                     <div class="flex justify-between items-center mb-3">
-                                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Speed</p>
+                                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">${t('speed')}</p>
                                         <span class="text-[10px] font-black text-white">75%</span>
                                     </div>
                                     <input type="range" min="0" max="100" value="75" class="w-full custom-slider">
@@ -357,7 +494,7 @@
                         </div>
 
                         <div class="flex-1 border-l border-white/5 pl-16 flex flex-col items-center">
-                            <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6 w-full text-left">Chroma Palette</p>
+                            <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6 w-full text-left">${t('palette')}</p>
 
                             <div class="relative w-[200px] h-[200px] mb-8 flex items-center justify-center flex-shrink-0 cursor-crosshair group/wheel overflow-hidden rounded-full">
                                 <div class="absolute inset-0 scale-100 group-hover/wheel:scale-[1.05] transition-transform duration-700" style="background: conic-gradient(from 90deg, red, yellow, lime, cyan, blue, magenta, red); -webkit-mask-image: radial-gradient(circle, transparent 45%, black 46%); mask-image: radial-gradient(circle, transparent 45%, black 46%);"></div>
@@ -367,7 +504,7 @@
                             </div>
 
                             <div class="w-full">
-                                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4 text-left">Quick Presets</p>
+                                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4 text-left">${t('presets')}</p>
                                 <div class="flex flex-wrap justify-start gap-4">
                                     <div class="w-6 h-6 rounded-full bg-[#ef4444] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
                                     <div class="w-6 h-6 rounded-full bg-[#f97316] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
@@ -384,7 +521,7 @@
                 </div>
             `;
         } else if (index === 3) {
-            html = `<div class="h-[80px] flex flex-col justify-center items-center"><p class="text-xs font-black italic tracking-widest text-zinc-500 uppercase">System Ready</p></div>`;
+            html = `<div class="h-[80px] flex flex-col justify-center items-center"><p class="text-xs font-black italic tracking-widest text-zinc-500 uppercase">${t('sysReady')}</p></div>`;
         }
         drawerContent.innerHTML = html;
     }
@@ -392,9 +529,8 @@
     function switchPrev(e) { if (e) e.stopPropagation(); let idx = profiles.findIndex(p => p.id === activeProfileId); if (idx > 0) { activeProfileId = profiles[idx - 1].id; autoSave(); renderKeyboard(); renderHTML(0); } }
     function switchNext(e) { if (e) e.stopPropagation(); let idx = profiles.findIndex(p => p.id === activeProfileId); if (idx < profiles.length - 1) { activeProfileId = profiles[idx + 1].id; autoSave(); renderKeyboard(); renderHTML(0); } }
     function editProfileName(id, e) { e.stopPropagation(); const span = document.getElementById(`name-${id}`); if (!span) return; span.contentEditable = "true"; span.focus(); const range = document.createRange(); range.selectNodeContents(span); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); const saveEdit = () => { span.contentEditable = "false"; const newName = span.innerText.trim(); const p = profiles.find(profile => profile.id === id); if (p && newName) { p.name = newName; autoSave(); } else if (p) { span.innerText = p.name; } span.removeEventListener('blur', saveEdit); span.removeEventListener('keydown', keydownHandler); }; const keydownHandler = (event) => { if (event.key === 'Enter') { event.preventDefault(); saveEdit(); } }; span.addEventListener('blur', saveEdit); span.addEventListener('keydown', keydownHandler); }
-    function addNewProfile(e) { if (profiles.length >= 5) { alert('配置槽位已满 (Max 5)。请删除后重试。'); return; } const id = 'p_' + Date.now(); profiles.push({ id, name: 'Profile 0' + (profiles.length + 1), layout: JSON.parse(JSON.stringify(RAW_LAYOUT)) }); activeProfileId = id; autoSave(); renderKeyboard(); renderHTML(0); }
+    function addNewProfile(e) { if (profiles.length >= 5) { alert(t('alertFull')); return; } const id = 'p_' + Date.now(); profiles.push({ id, name: 'Profile 0' + (profiles.length + 1), layout: JSON.parse(JSON.stringify(RAW_LAYOUT)) }); activeProfileId = id; autoSave(); renderKeyboard(); renderHTML(0); }
 
-    // 【精准修改 2】：如果当前是 default，则导入必定追加新建配置；只有自定义配置才会被导入的文件替换
     function triggerImport(e) {
         const input = document.createElement('input');
         input.type = 'file';
@@ -408,12 +544,11 @@
                     const data = JSON.parse(readEvent.target.result);
                     if (data && data.layout) {
                         if (activeProfileId === 'default') {
-                            if (profiles.length >= 5) { alert('配置槽位已满 (Max 5)。请删除后重试。'); return; }
+                            if (profiles.length >= 5) { alert(t('alertFull')); return; }
                             const newId = 'p_' + Date.now();
                             profiles.push({ id: newId, name: (data.name || 'Imported Profile'), layout: data.layout });
                             activeProfileId = newId;
                         } else {
-                            // 替换当前自定义配置
                             let p = getActiveProfile();
                             p.layout = data.layout;
                             if (data.name) p.name = data.name;
@@ -444,36 +579,48 @@
 
     function downloadProfile(id, e) { e.stopPropagation(); const p = profiles.find(p => p.id === id); const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(p, null, 2)); const a = document.createElement('a'); a.href = data; a.download = (p.name || 'Profile') + ".json"; a.click(); }
 
-    // 【精准修改 3】：改键逻辑修复，使用 return 彻底阻止内层循环溢出
     function applyRemap(val) {
         if (selectedKey) {
-            const idx = selectedKey.dataset.index, p = getActiveProfile();
+            const p = getActiveProfile();
+
+            if (p.id === 'default') {
+                alert(t('alertLock'));
+                return;
+            }
+
+            const idx = selectedKey.dataset.index;
             let count = 0;
+            let found = false;
+
             for(let r=0; r<p.layout.length; r++) {
                 for(let c=0; c<p.layout[r].length; c++) {
                     if (typeof p.layout[r][c] === 'string') {
                         if (count == idx) {
                             lastRemapHistory = { r, c, oldVal: p.layout[r][c], newVal: val, keyEl: selectedKey, profileId: p.id };
                             p.layout[r][c] = val;
-
-                            selectedKey.querySelector('span').innerHTML = val.replace('\n', '<br>');
-                            selectedKey.dataset.name = val.replace('\n', ' ');
-
-                            const targetTitle = document.getElementById('target-key-display');
-                            if (targetTitle) targetTitle.innerText = val.replace('\n', ' ');
-
-                            const undoBtn = document.getElementById('undo-btn');
-                            if (undoBtn) {
-                                undoBtn.classList.remove('opacity-0', 'pointer-events-none');
-                                undoBtn.classList.add('opacity-100');
-                            }
-
-                            autoSave();
-                            return; // 修复点：找到对应键位后，立刻通过 return 终止函数，绝不污染后续按键
+                            found = true;
+                            break;
                         }
                         count++;
                     }
                 }
+                if (found) break;
+            }
+
+            if (found) {
+                selectedKey.querySelector('span').innerHTML = val.replace('\n', '<br>');
+                selectedKey.dataset.name = val.replace('\n', ' ');
+
+                const targetTitle = document.getElementById('target-key-display');
+                if (targetTitle) targetTitle.innerText = val.replace('\n', ' ');
+
+                const undoBtn = document.getElementById('undo-btn');
+                if (undoBtn) {
+                    undoBtn.classList.remove('opacity-0', 'pointer-events-none');
+                    undoBtn.classList.add('opacity-100');
+                }
+
+                autoSave();
             }
         }
     }
@@ -510,7 +657,7 @@
             const targetTitle = document.getElementById('target-key-display');
             if (targetTitle) targetTitle.innerText = name;
         } else if (activeNav === 2) {
-            // 在灯光模式只高亮，不切菜单！
+            // 在灯光模式只高亮，不切菜单
         } else {
             handleNav(null, 1);
         }
@@ -528,8 +675,11 @@
 
     function moveHighlight(index, btn) { highlightPill.style.left = btn.offsetLeft + 'px'; highlightPill.style.width = btn.offsetWidth + 'px'; if (index === 0) highlightPill.style.borderRadius = '1.5rem 0 0 1.5rem'; else if (index === 3) highlightPill.style.borderRadius = '0 1.5rem 1.5rem 0'; else highlightPill.style.borderRadius = '12px'; highlightPill.style.opacity = '1'; highlightPill.style.transform = 'scale(1)'; }
 
+    // 连接触发
     document.getElementById('connect-trigger').onclick = () => {
+        const logo = document.getElementById('header-logo');
         document.getElementById('entry').style.opacity = '0';
+        logo.classList.remove('opacity-0', 'pointer-events-none');
         setTimeout(() => {
             document.getElementById('entry').style.display = 'none';
             renderKeyboard();
