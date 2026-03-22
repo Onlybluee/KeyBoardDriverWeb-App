@@ -63,8 +63,11 @@
         .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
         .custom-slider::-webkit-slider-runnable-track { width: 100%; height: 5px; cursor: pointer; background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
 
+        /* 按键基础样式 */
         .key-cap { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.45); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; line-height: 1.1; white-space: pre-line !important; cursor: pointer; }
-        .key-cap:hover { box-shadow: 0 0 15px var(--accent); border-color: var(--accent); color: #fff; z-index: 40; }
+
+        /* 强化夜间模式 Hover */
+        .key-cap:hover { box-shadow: 0 0 15px var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; z-index: 40; }
         .key-selected { background: rgba(59, 130, 246, 0.2) !important; color: #fff !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); z-index: 50; }
 
         #header-info { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; width: 100%; position: fixed; top: 0; z-index: 250; }
@@ -82,25 +85,14 @@
         #dock-bar.appear { opacity: 1; transform: translateY(0); }
         .dock-container { background: var(--glass-bg); backdrop-filter: blur(50px) saturate(180%); border: 1px solid var(--glass-border); padding: 0; border-radius: 1.5rem; display: flex; align-items: stretch; position: relative; z-index: 100; }
         #active-highlight { position: absolute; top: 0; bottom: 0; left: 0; background: rgba(59, 130, 246, 0.15); box-shadow: 0 0 12px rgba(59, 130, 246, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; opacity: 0; transform: scale(0.8); z-index: 0; }
-        .dock-item { transition: all 0.3s ease; color: rgba(255, 255, 255, 0.3); font-size: 11px !important; padding: 16px 40px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; border: none; background: transparent; position: relative; z-index: 10; cursor: pointer; }
-        .dock-item:hover { color: #fff; text-shadow: 0 0 10px rgba(59,130,246,0.6); }
+
+        .dock-item { transition: all 0.3s ease; color: rgba(255, 255, 255, 0.3); font-size: 13px !important; padding: 16px 40px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; border: none; background: transparent; position: relative; z-index: 10; cursor: pointer; }
+        /* 强化夜间模式 Dock Hover */
+        .dock-item:hover { color: #fff !important; text-shadow: 0 0 10px rgba(59,130,246,0.6) !important; }
         .dock-item.active { color: var(--accent) !important; }
 
-        #sub-drawer {
-            width: 860px;
-            margin-top: var(--global-gap);
-            background: var(--glass-bg);
-            backdrop-filter: blur(60px) saturate(200%);
-            border: 1px solid var(--glass-border);
-            border-radius: 3.5rem;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-            overflow: hidden;
-            height: 0px;
-            opacity: 0;
-            box-sizing: border-box;
-        }
+        #sub-drawer { width: 860px; margin-top: var(--global-gap); background: var(--glass-bg); backdrop-filter: blur(60px) saturate(200%); border: 1px solid var(--glass-border); border-radius: 3.5rem; box-shadow: 0 40px 80px rgba(0,0,0,0.4); overflow: hidden; height: 0px; opacity: 0; box-sizing: border-box; }
         #sub-drawer.open { opacity: 1; }
-
         #drawer-content { transition: opacity 0.15s ease; opacity: 1; }
         #drawer-content.fade-out { opacity: 0; }
 
@@ -110,35 +102,46 @@
 
         .profile-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
 
-        /* 白天模式 */
+        /* ================== 白天模式：深度精修 ================== */
         body.light-mode {
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.9);
             color: #0f172a;
         }
-        body.light-mode .bg-flowing {
-            background: linear-gradient(135deg, #e2e8f0, #f8fafc, #cbd5e1, #f1f5f9, #e2e8f0);
-            background-size: 400% 400%;
-        }
+        body.light-mode .bg-flowing { background: linear-gradient(135deg, #e2e8f0, #f8fafc, #cbd5e1, #f1f5f9, #e2e8f0); }
         body.light-mode .glass-overlay { background: rgba(255, 255, 255, 0.3); }
         body.light-mode .text-white { color: #0f172a !important; }
-        body.light-mode .text-zinc-600 { color: #64748b !important; }
-        body.light-mode .text-zinc-400, body.light-mode .text-zinc-500 { color: #94a3b8 !important; }
-        body.light-mode .bg-zinc-800\/40 { background-color: rgba(0,0,0,0.04) !important; color: #475569 !important;}
-        body.light-mode .border-white\/10, body.light-mode .border-white\/5 { border-color: rgba(0,0,0,0.06) !important; }
-        body.light-mode .bg-white\/5 { background-color: rgba(0,0,0,0.03) !important; }
-        body.light-mode .key-cap { background: rgba(255, 255, 255, 0.9); border: 1px solid #ffffff; border-top: 1px solid rgba(0, 0, 0, 0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04); color: #475569; }
-        body.light-mode .key-cap:hover { background: #fff; color: var(--accent) !important; border-color: var(--accent); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25); }
-        body.light-mode .key-cap.key-selected, body.light-mode .key-cap.key-selected:hover { background: var(--accent) !important; color: #fff !important; border-color: var(--accent); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important; }
-        body.light-mode .key-option { background: rgba(255, 255, 255, 0.8); border: 1px solid #ffffff; color: #475569; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
-        body.light-mode .key-option:hover { background: var(--accent); color: #fff !important; border-color: var(--accent); }
-        body.light-mode .profile-card { background: rgba(255,255,255,0.7); border-color: var(--accent) !important; box-shadow: 0 8px 24px rgba(59,130,246,0.15); }
-        body.light-mode #sub-drawer { box-shadow: 0 25px 60px rgba(0,0,0,0.12), 0 10px 20px rgba(0,0,0,0.05); }
-        body.light-mode #kb-stage { box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
-        body.light-mode .dock-container { box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        body.light-mode .text-zinc-600 { color: #000000 !important; } /* 箭头启用：黑色 */
+        body.light-mode .text-zinc-800 { color: #d1d5db !important; } /* 箭头禁用：灰色 */
+        body.light-mode .text-zinc-400 { color: #94a3b8 !important; }
+        body.light-mode .text-zinc-500 { color: #94a3b8 !important; }
+
+        /* 导出导入新建按钮高亮：仅文字变黑 */
+        body.light-mode .text-zinc-400:hover { color: #000000 !important; }
+        /* 删除按钮红色高亮 */
+        body.light-mode .hover\:text-red-500:hover { color: #ef4444 !important; }
+
+        /* 默认标签：背景减淡 */
+        body.light-mode .bg-zinc-800\/40 { background-color: rgba(0,0,0,0.04) !important; color: #64748b !important;}
+        body.light-mode .border-white\/10, body.light-mode .border-white\/5 { border-color: rgba(255,255,255,0.8) !important; }
+
+        /* 键盘键帽白天模式修正 */
+        body.light-mode .key-cap {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ffffff;
+            border-top: 1px solid #ffffff !important; /* 核心：删除上方横线 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+            color: #64748b;
+        }
+        body.light-mode .key-cap:hover { background: #fff !important; color: var(--accent) !important; border-color: var(--accent) !important; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important; }
+        body.light-mode .key-cap.key-selected, body.light-mode .key-cap.key-selected:hover { background: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important; }
+
         body.light-mode .dock-item { color: #64748b; }
-        body.light-mode .dock-item:hover { color: #0f172a; text-shadow: 0 0 10px #fff; }
-        body.light-mode .dock-item.active { color: var(--accent) !important; text-shadow: none; }
+        body.light-mode .dock-item:hover { color: #0f172a !important; text-shadow: 0 0 10px #fff !important; }
+        body.light-mode .dock-item.active { color: var(--accent) !important; text-shadow: none !important; }
+        body.light-mode .profile-card { background: rgba(255,255,255,0.7); border-color: var(--accent) !important; box-shadow: 0 8px 24px rgba(59,130,246,0.15); }
+
+        /* 灯光选中修正 */
         body.light-mode .\!text-white { color: #0f172a !important; }
         body.light-mode .\!bg-blue-500\/10 { background-color: rgba(59,130,246,0.15) !important; border-color: var(--accent) !important; }
         body.light-mode .custom-slider::-webkit-slider-runnable-track { background: rgba(0, 0, 0, 0.1) !important; }
@@ -158,10 +161,15 @@
         </div>
 
         <div class="flex items-center gap-6 z-[200] pointer-events-auto h-8">
-            <button onclick="toggleTheme(event)" id="theme-btn" class="w-8 h-8 flex items-center justify-center hover:scale-110 transition-transform text-zinc-400 hover:text-white">
-            </button>
-            <button onclick="toggleLang(event)" id="lang-btn" class="h-8 flex items-center text-[11px] font-bold text-zinc-400 hover:text-white transition-colors tracking-widest leading-none">EN</button>
-            <div class="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_12px_#3b82f6]"></div>
+            <div class="w-8 h-8 flex items-center justify-center">
+                <button onclick="toggleTheme(event)" id="theme-btn" class="hover:scale-110 transition-transform text-zinc-400 hover:text-white flex items-center justify-center"></button>
+            </div>
+            <div class="w-8 h-8 flex items-center justify-center">
+                <button onclick="toggleLang(event)" id="lang-btn" class="text-[11px] font-bold text-zinc-400 hover:text-white transition-colors tracking-widest leading-none flex items-center justify-center">EN</button>
+            </div>
+            <div class="w-8 h-8 flex items-center justify-center">
+                <div class="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_12px_#3b82f6]"></div>
+            </div>
         </div>
     </div>
 </header>
@@ -190,7 +198,6 @@
 </div>
 
 <script>
-    // 线性标志模板
     const ICON_SUN = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path stroke-linecap="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>`;
     const ICON_MOON = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
 
@@ -198,32 +205,8 @@
     const keyLibrary = { "基础字母": ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"], "数字与符号": ["1","2","3","4","5","6","7","8","9","0","-","=","[","]","\\",";","'",",",".","/","`"], "控制键": ["Esc","Tab","Caps","Shift","Ctrl","Win","Alt","Space","Enter","Back"], "功能区": ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"], "系统键": ["PrtSc","Scroll","Pause","Ins","Home","PgUp","Del","End","PgDn","↑","↓","←","→"] };
 
     const i18n = {
-        zh: {
-            nav0: "配置", nav1: "按键", nav2: "灯光", nav3: "信息",
-            profMgt: "配置管理", export: "导出", import: "导入", new: "+ 新建", def: "默认", del: "删除",
-            locked: "已锁定", target: "目标按键", undo: "撤销", unsel: "未选择",
-            lightCtrl: "灯光控制", rgbFlow: "全局 RGB 流光", effects: "光效矩阵",
-            l1: "常亮", l2: "呼吸", l3: "波浪", l4: "涟漪", l5: "单点亮", l6: "繁星",
-            bright: "亮度", speed: "速度", palette: "调色板", presets: "快速预设",
-            sysReady: "系统已就绪",
-            lib1: "基础字母", lib2: "数字与符号", lib3: "控制键", lib4: "功能区", lib5: "系统键",
-            alertFull: "配置槽位已满 (Max 5)。请删除后重试。",
-            alertLock: "系统默认配置为出厂设定，已物理锁死，无法修改按键。\n请新建配置 (+ NEW) 进行自定义。",
-            waitConn: "等待设备连接..."
-        },
-        en: {
-            nav0: "CONFIG", nav1: "KEYS", nav2: "LIGHTING", nav3: "INFO",
-            profMgt: "PROFILES MGT", export: "EXPORT", import: "IMPORT", new: "+ NEW", def: "DEFAULT", del: "DELETE",
-            locked: "LOCKED", target: "TARGET KEY", undo: "UNDO", unsel: "UNSELECTED",
-            lightCtrl: "LIGHTING CONTROL", rgbFlow: "GLOBAL RGB FLOW", effects: "EFFECTS MATRIX",
-            l1: "STATIC", l2: "BREATH", l3: "WAVE", l4: "RIPPLE", l5: "REACT", l6: "STARS",
-            bright: "BRIGHTNESS", speed: "SPEED", palette: "CHROMA PALETTE", presets: "QUICK PRESETS",
-            sysReady: "SYSTEM READY",
-            lib1: "LETTERS", lib2: "SYMBOLS", lib3: "MODIFIERS", lib4: "FUNCTIONS", lib5: "SYSTEM",
-            alertFull: "Profile slots full (Max 5). Please delete one and try again.",
-            alertLock: "Default profile is locked.\nPlease create a new profile (+ NEW) to customize.",
-            waitConn: "WAITING FOR CONNECTION..."
-        }
+        zh: { nav0: "配置", nav1: "按键", nav2: "灯光", nav3: "信息", profMgt: "配置管理", export: "导出", import: "导入", new: "+ 新建", def: "默认", del: "删除", locked: "已锁定", target: "目标按键", undo: "撤销", unsel: "未选择", lightCtrl: "灯光控制", rgbFlow: "全局 RGB 流光", effects: "光效矩阵", l1: "常亮", l2: "呼吸", l3: "波浪", l4: "涟漪", l5: "单点亮", l6: "繁星", bright: "亮度", speed: "速度", palette: "调色板", presets: "快速预设", sysReady: "系统已就绪", lib1: "基础字母", lib2: "数字与符号", lib3: "控制键", lib4: "功能区", lib5: "系统键", alertFull: "配置槽位已满 (Max 5)。请删除后重试。", alertLock: "系统默认配置为出厂设定，已物理锁死，无法修改按键。\n请新建配置 (+ NEW) 进行自定义。", waitConn: "等待设备连接..." },
+        en: { nav0: "CONFIG", nav1: "KEYS", nav2: "LIGHTING", nav3: "INFO", profMgt: "PROFILES MGT", export: "EXPORT", import: "IMPORT", new: "+ NEW", def: "DEFAULT", del: "DELETE", locked: "LOCKED", target: "TARGET KEY", undo: "UNDO", unsel: "UNSELECTED", lightCtrl: "LIGHTING CONTROL", rgbFlow: "GLOBAL RGB FLOW", effects: "EFFECTS MATRIX", l1: "STATIC", l2: "BREATH", l3: "WAVE", l4: "RIPPLE", l5: "REACT", l6: "STARS", bright: "BRIGHTNESS", speed: "SPEED", palette: "CHROMA PALETTE", presets: "QUICK PRESETS", sysReady: "SYSTEM READY", lib1: "LETTERS", lib2: "SYMBOLS", lib3: "MODIFIERS", lib4: "FUNCTIONS", lib5: "SYSTEM", alertFull: "Profile slots full (Max 5). Please delete one and try again.", alertLock: "Default profile is locked.\nPlease create a new profile (+ NEW) to customize.", waitConn: "WAITING FOR CONNECTION..." }
     };
 
     let profiles = JSON.parse(localStorage.getItem('reze80_profiles'));
@@ -270,11 +253,11 @@
         const themeBtn = document.getElementById('theme-btn');
         if(currentTheme === 'light') {
             document.body.classList.add('light-mode');
-            themeBtn.innerHTML = ICON_MOON; // 显示月亮表示点击切到黑夜
+            themeBtn.innerHTML = ICON_MOON;
             if(entry) entry.style.backgroundColor = '#f4f4f5';
         } else {
             document.body.classList.remove('light-mode');
-            themeBtn.innerHTML = ICON_SUN; // 显示太阳表示点击切到白天
+            themeBtn.innerHTML = ICON_SUN;
             if(entry) entry.style.backgroundColor = '#030405';
         }
         document.getElementById('lang-btn').innerText = currentLang === 'zh' ? 'EN' : '中';
@@ -286,7 +269,6 @@
     }
     applyThemeAndLang();
 
-    // 点击 Logo 回退至连接页面逻辑
     function goBackToEntry() {
         const entry = document.getElementById('entry');
         const logo = document.getElementById('header-logo');
