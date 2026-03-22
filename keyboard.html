@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>REZE-80 | Perfect Aesthetic OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030405;
+            --accent: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.035);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --global-gap: 32px;
+        }
+
+        /* 固定方向、线性流动的黑暗背景 */
+        @keyframes flow {
+            from { background-position: 0% 0%; }
+            to { background-position: 100% 100%; }
+        }
+        .bg-flowing {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: linear-gradient(135deg, #030405, #0a0c10, #050608, #0a0c10, #030405);
+            background-size: 400% 400%;
+            animation: flow 20s linear infinite;
+        }
+        .glass-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            backdrop-filter: blur(80px) saturate(180%);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes profile-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .profile-anim-in { animation: profile-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        body {
+            background-color: transparent;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            overflow-anchor: auto;
+            -webkit-font-smoothing: antialiased;
+        }
+        body::-webkit-scrollbar { width: 0px; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+        .custom-slider { -webkit-appearance: none; background: transparent; outline: none; }
+        .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); margin-top: -7px; transition: transform 0.1s; }
+        .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        .custom-slider::-webkit-slider-runnable-track { width: 100%; height: 5px; cursor: pointer; background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
+
+        .key-cap { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.45); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; line-height: 1.1; white-space: pre-line !important; cursor: pointer; }
+        .key-selected { background: rgba(59, 130, 246, 0.2) !important; color: #fff !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); z-index: 50; }
+
+        #header-info { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; width: 100%; position: fixed; top: 0; z-index: 150; pointer-events: none; }
+        .header-hidden { transform: translateY(-110%) !important; opacity: 0 !important; }
+
+        #main-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; width: 100%; padding-top: 15vh; padding-bottom: 15vh; box-sizing: border-box; }
+
+        #stage-group { display: flex; flex-direction: column; align-items: center; width: 100%; transform-origin: center top; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        #stage-group.stage-active { transform: translateY(-20px) scale(0.96); }
+
+        #kb-stage { opacity: 0; margin-bottom: var(--global-gap); background: var(--glass-bg); backdrop-filter: blur(40px) saturate(180%); border: 1px solid var(--glass-border); padding: 40px; border-radius: 4rem; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); width: fit-content; flex-shrink: 0; transform: translateY(-30px); }
+        #kb-stage.appear { transform: translateY(0); opacity: 1; }
+
+        #dock-bar { opacity: 0; transform: translateY(25px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        #dock-bar.appear { opacity: 1; transform: translateY(0); }
+        .dock-container { background: var(--glass-bg); backdrop-filter: blur(50px) saturate(180%); border: 1px solid var(--glass-border); padding: 0; border-radius: 1.5rem; display: flex; align-items: stretch; position: relative; z-index: 100; }
+        #active-highlight { position: absolute; top: 0; bottom: 0; left: 0; background: rgba(59, 130, 246, 0.15); box-shadow: 0 0 12px rgba(59, 130, 246, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; opacity: 0; transform: scale(0.8); z-index: 0; }
+        .dock-item { transition: color 0.3s ease; color: rgba(255, 255, 255, 0.3); font-size: 11px !important; padding: 16px 40px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; border: none; background: transparent; position: relative; z-index: 10; cursor: pointer; }
+        .dock-item.active { color: var(--accent) !important; }
+
+        #sub-drawer {
+            width: 860px;
+            margin-top: var(--global-gap);
+            background: var(--glass-bg);
+            backdrop-filter: blur(60px) saturate(200%);
+            border: 1px solid var(--glass-border);
+            border-radius: 3.5rem;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+            overflow: hidden;
+            height: 0px;
+            opacity: 0;
+            box-sizing: border-box;
+        }
+        #sub-drawer.open { opacity: 1; }
+
+        #drawer-content { transition: opacity 0.15s ease; opacity: 1; }
+        #drawer-content.fade-out { opacity: 0; }
+
+        .key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; }
+        .key-option { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px 0; text-align: center; font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.5); }
+        .key-option:hover { background: var(--accent); color: #fff; transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+
+        .profile-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+    </style>
+</head>
+<body onclick="resetView()">
+
+<div class="bg-flowing"></div>
+<div class="glass-overlay"></div>
+
+<header id="header-info">
+    <div class="flex justify-between items-center pt-8 px-16">
+        <div class="flex items-center gap-6">
+            <h1 class="text-2xl font-black italic uppercase text-white">REZE-80</h1>
+            <span class="text-[9px] text-zinc-600 font-bold tracking-[0.4em]">80% TKL / POGO TECH</span>
+        </div>
+        <div class="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_12px_#3b82f6]"></div>
+    </div>
+</header>
+
+<div id="entry" class="fixed inset-0 flex flex-col items-center justify-center transition-opacity duration-700 bg-[#030405] z-[200]">
+    <div id="connect-trigger" class="w-56 h-56 rounded-[3.5rem] border-2 border-zinc-800 flex items-center justify-center cursor-pointer hover:border-blue-500 hover:scale-105 transition-all">
+        <span class="text-6xl text-zinc-700 font-extralight">+</span>
+    </div>
+</div>
+
+<div id="main-content">
+    <div id="stage-group">
+        <main id="kb-stage"><div id="key-canvas" class="relative"></div></main>
+        <nav id="dock-bar" class="dock-container">
+            <div id="active-highlight"></div>
+            <button class="dock-item" onclick="handleNav(event, 0)">配置</button>
+            <button class="dock-item" onclick="handleNav(event, 1)">按键</button>
+            <button class="dock-item" onclick="handleNav(event, 2)">灯光</button>
+            <button class="dock-item" onclick="handleNav(event, 3)">信息</button>
+        </nav>
+        <div id="sub-drawer" onclick="event.stopPropagation()"><div id="drawer-padding" class="px-10 pt-6 pb-10"><div id="drawer-content"></div></div></div>
+    </div>
+</div>
+
+<script>
+    const RAW_LAYOUT = [["Esc",{"x":1},"F1","F2","F3","F4",{"x":0.5},"F5","F6","F7","F8",{"x":0.5},"F9","F10","F11","F12",{"x":0.25},"PrtSc","Scroll Lock","Pause\nBreak"],[{"y":0.5},"~\n`","!\n1","@\n2","#\n3","$\n4","%\n5","^\n6","&\n7","*\n8","(\n9",")\n0","_\n-","+\n=",{"w":2},"Backspace",{"x":0.25},"Insert","Home","PgUp"],[{"w":1.5},"Tab","Q","W","E","R","T","Y","U","I","O","P","{\n[","}\n]",{"w":1.5},"|\n\\",{"x":0.25},"Delete","End","PgDn"],[{"w":1.75},"Caps Lock","A","S","D","F","G","H","J","K","L",":\n;","\"\n'",{"w":2.25},"Enter"],[{"w":2.25},"Shift","Z","X","C","V","B","N","M","<\n,",">\n.","?\n/",{"w":2.75},"Shift",{"x":1.25},"↑"],[{"w":1.25},"Ctrl",{"w":1.25},"Win",{"w":1.25},"Alt",{"a":7,"w":6.25},"",{"a":4,"w":1.25},"Alt",{"w":1.25},"Win",{"w":1.25},"Fn",{"w":1.25},"Ctrl",{"x":0.25},"←","↓","→"]];
+    const keyLibrary = { "基础字母": ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"], "数字与符号": ["1","2","3","4","5","6","7","8","9","0","-","=","[","]","\\",";","'",",",".","/","`"], "控制键": ["Esc","Tab","Caps","Shift","Ctrl","Win","Alt","Space","Enter","Back"], "功能区": ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"], "系统键": ["PrtSc","Scroll","Pause","Ins","Home","PgUp","Del","End","PgDn","↑","↓","←","→"] };
+
+    let profiles = JSON.parse(localStorage.getItem('reze80_profiles'));
+    if (!profiles || profiles.length === 0) { profiles = [{ id: 'default', name: 'Default Profile', layout: JSON.parse(JSON.stringify(RAW_LAYOUT)) }]; }
+    let activeProfileId = localStorage.getItem('reze80_active_id') || 'default';
+    if (!profiles.find(p => p.id === activeProfileId)) activeProfileId = profiles[0].id;
+
+    let isLightingOn = true;
+    let activeNav = -1, selectedKey = null;
+    let lastRemapHistory = null;
+
+    const stageGroup = document.getElementById('stage-group'), subDrawer = document.getElementById('sub-drawer'), drawerContent = document.getElementById('drawer-content'), highlightPill = document.getElementById('active-highlight'), canvas = document.getElementById('key-canvas'), header = document.getElementById('header-info');
+
+    function getActiveProfile() { return profiles.find(p => p.id === activeProfileId) || profiles[0]; }
+    function autoSave() { localStorage.setItem('reze80_profiles', JSON.stringify(profiles)); localStorage.setItem('reze80_active_id', activeProfileId); }
+    function syncHeader() { if (activeNav === -1 && window.scrollY < 5) header.classList.remove('header-hidden'); else header.classList.add('header-hidden'); }
+    window.addEventListener('scroll', syncHeader);
+
+    function toggleLighting(isOn) {
+        isLightingOn = isOn;
+        const controls = document.getElementById('lighting-controls');
+        if (controls) {
+            if (isOn) controls.classList.remove('opacity-20', 'pointer-events-none', 'grayscale');
+            else controls.classList.add('opacity-20', 'pointer-events-none', 'grayscale');
+        }
+    }
+
+    const TARGET_HEIGHTS = [186, 486, 486, 146];
+
+    function handleNav(event, index) {
+        if (event) event.stopPropagation();
+        if (activeNav === index) {
+            resetView();
+            return;
+        }
+
+        const isSwitching = activeNav !== -1;
+        const prevNav = activeNav;
+
+        lastRemapHistory = null;
+
+        document.querySelectorAll('.dock-item').forEach((it, i) => it.classList.toggle('active', i === index));
+        moveHighlight(index, document.querySelectorAll('.dock-item')[index]);
+        activeNav = index;
+        stageGroup.classList.add('stage-active');
+        header.classList.add('header-hidden');
+        const keyName = selectedKey ? selectedKey.dataset.name : "未选择";
+
+        const targetH = TARGET_HEIGHTS[index];
+
+        if (!isSwitching) {
+            drawerContent.classList.remove('fade-out');
+            renderHTML(index, keyName);
+
+            subDrawer.style.transition = 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease';
+            subDrawer.classList.add('open');
+            subDrawer.style.height = targetH + 'px';
+
+            // 【完美修复】：等动画撑开 200ms 后再滚动，确保浏览器没有拦截，稳稳追焦300px
+            if (index === 1 || index === 2) {
+                setTimeout(() => { window.scrollBy({ top: 320, behavior: 'smooth' }); }, 200);
+            }
+        } else {
+            const isSameHeight = (prevNav === 1 || prevNav === 2) && (index === 1 || index === 2);
+
+            drawerContent.classList.add('fade-out');
+            setTimeout(() => {
+                renderHTML(index, keyName);
+
+                if (!isSameHeight) {
+                    subDrawer.style.transition = 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                    subDrawer.style.height = targetH + 'px';
+                }
+
+                drawerContent.classList.remove('fade-out');
+            }, 150);
+        }
+    }
+
+    function resetView() {
+        if (activeNav === -1 && !selectedKey) return;
+        stageGroup.classList.remove('stage-active');
+        document.querySelectorAll('.dock-item').forEach(it => it.classList.remove('active'));
+        highlightPill.style.opacity = '0'; highlightPill.style.transform = 'scale(0.8)';
+        if (selectedKey) { selectedKey.classList.remove('key-selected'); selectedKey = null; }
+
+        subDrawer.style.transition = 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
+        subDrawer.classList.remove('open');
+        subDrawer.style.height = '0px';
+
+        setTimeout(() => {
+            activeNav = -1;
+            syncHeader();
+        }, 400);
+    }
+
+    function renderHTML(index, keyName) {
+        let html = '';
+        if (index === 0) {
+            let currentIndex = profiles.findIndex(p => p.id === activeProfileId);
+            if (currentIndex === -1) currentIndex = 0;
+            let p = profiles[currentIndex];
+            let displayNum = '0' + (currentIndex + 1);
+
+            const isPrevDisabled = currentIndex === 0;
+            const isNextDisabled = currentIndex === profiles.length - 1;
+
+            html = `
+                <div class="h-[120px] flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-6 px-2">
+                        <div class="flex items-center gap-6">
+                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Profiles MGT</p>
+                            <div class="flex gap-4">
+                                <button onclick="downloadProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">EXPORT</button>
+                                <button onclick="triggerImport(event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">IMPORT</button>
+                                <button onclick="addNewProfile(event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">+ NEW</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 border border-white/10 group transition-colors hover:bg-white/10 pr-2">
+                            <button ${isPrevDisabled ? '' : 'onclick="switchPrev(event)"'} class="w-6 h-6 flex items-center justify-center ${isPrevDisabled ? 'text-zinc-800 cursor-not-allowed' : 'text-zinc-600 hover:!text-white cursor-pointer'} transition-colors">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="5" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <span class="text-[11px] font-black text-zinc-600 group-hover:text-white transition-colors w-5 text-center select-none leading-none flex items-center justify-center">${displayNum}</span>
+                            <button ${isNextDisabled ? '' : 'onclick="switchNext(event)"'} class="w-6 h-6 flex items-center justify-center ${isNextDisabled ? 'text-zinc-800 cursor-not-allowed' : 'text-zinc-600 hover:!text-white cursor-pointer'} transition-colors">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="5" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="px-2">
+                        <div id="card-${p.id}" class="profile-card profile-anim-in p-5 rounded-[2rem] border border-blue-500 bg-blue-500/10 ring-2 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.2)] flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <span id="name-${p.id}" onclick="if(this.isContentEditable) event.stopPropagation();" class="text-sm font-extrabold outline-none focus:text-blue-400 focus:border-b focus:border-blue-400 border-b border-transparent transition-all text-white">${p.name}</span>
+                                ${p.id !== 'default' ? `<svg onclick="editProfileName('${p.id}', event)" class="w-3.5 h-3.5 text-zinc-600 hover:text-blue-400 transition-colors cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>` : ''}
+                            </div>
+                            <div class="flex items-center gap-4">
+                                ${p.id !== 'default' ? `<button onclick="deleteProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-red-500 tracking-wider transition-colors">DELETE</button>` : `<span class="text-[10px] font-bold text-zinc-500 tracking-wider select-none bg-zinc-800/40 px-2.5 py-1 rounded-md border border-white/5">DEFAULT</span>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (index === 1) {
+            html = `
+                <div class="h-[420px] flex flex-col">
+                    <div class="mb-6 px-2 flex justify-between items-center shrink-0">
+                        <div>
+                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Target Key</p>
+                            <h2 id="target-key-display" class="text-2xl font-black text-white mt-1">${keyName}</h2>
+                        </div>
+                        <button id="undo-btn" onclick="undoRemap(event)" class="opacity-0 pointer-events-none text-[10px] font-bold text-zinc-400 hover:text-white transition-all bg-white/5 px-3 py-1.5 rounded-full border border-white/10">UNDO</button>
+                    </div>
+                    <div class="overflow-y-auto pr-3 flex-1 custom-scrollbar" style="margin-right: -12px;">
+                        `;
+            for (let g in keyLibrary) { html += `<div class="mb-6"><p class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest mb-3 px-1">${g}</p><div class="key-grid">${keyLibrary[g].map(k => `<div class="key-option" onclick="applyRemap('${k}')">${k}</div>`).join('')}</div></div>`; }
+            html += `
+                    </div>
+                </div>`;
+        } else if (index === 2) {
+            const stateClass = isLightingOn ? '' : 'opacity-20 pointer-events-none grayscale';
+            const toggleState = isLightingOn ? 'checked' : '';
+            html = `
+                <div class="h-[420px] flex flex-col">
+                    <div class="mb-8 px-2 flex justify-between items-center pr-3 shrink-0">
+                        <div class="flex items-center gap-6">
+                            <p class="text-[11px] font-black text-blue-500 uppercase tracking-widest">Lighting Control</p>
+                            <span class="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em]">Global RGB Flow</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer group scale-110">
+                            <input type="checkbox" class="sr-only peer" ${toggleState} onchange="toggleLighting(this.checked)">
+                            <div class="w-10 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[18px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-zinc-400 peer-checked:after:bg-white after:border-zinc-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500/50 peer-checked:border-blue-500 border border-white/10 group-hover:border-white/30 transition-colors"></div>
+                        </label>
+                    </div>
+
+                    <div id="lighting-controls" class="flex px-2 gap-16 flex-1 transition-all duration-500 ${stateClass}">
+                        <div class="w-[380px] flex-shrink-0">
+                            <div class="mb-10">
+                                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4">Effects Matrix</p>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div class="key-option !py-3.5 !text-[10px] !border-blue-500 !bg-blue-500/10 !text-white !shadow-[0_0_20px_rgba(59,130,246,0.3)]">Static</div>
+                                    <div class="key-option !py-3.5 !text-[10px]">Breath</div>
+                                    <div class="key-option !py-3.5 !text-[10px]">Wave</div>
+                                    <div class="key-option !py-3.5 !text-[10px]">Ripple</div>
+                                    <div class="key-option !py-3.5 !text-[10px]">React</div>
+                                    <div class="key-option !py-3.5 !text-[10px]">Stars</div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-8 w-full">
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Brightness</p>
+                                        <span class="text-[10px] font-black text-white">100%</span>
+                                    </div>
+                                    <input type="range" min="0" max="100" value="100" class="w-full custom-slider">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Speed</p>
+                                        <span class="text-[10px] font-black text-white">75%</span>
+                                    </div>
+                                    <input type="range" min="0" max="100" value="75" class="w-full custom-slider">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 border-l border-white/5 pl-16 flex flex-col items-center">
+                            <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6 w-full text-left">Chroma Palette</p>
+
+                            <div class="relative w-[200px] h-[200px] mb-8 flex items-center justify-center flex-shrink-0 cursor-crosshair group/wheel overflow-hidden rounded-full">
+                                <div class="absolute inset-0 scale-100 group-hover/wheel:scale-[1.05] transition-transform duration-700" style="background: conic-gradient(from 90deg, red, yellow, lime, cyan, blue, magenta, red); -webkit-mask-image: radial-gradient(circle, transparent 45%, black 46%); mask-image: radial-gradient(circle, transparent 45%, black 46%);"></div>
+                                <div class="absolute inset-0 rounded-full border border-white/10 pointer-events-none shadow-[0_0_40px_rgba(0,0,0,0.6)]"></div>
+                                <div class="absolute w-[90px] h-[90px] rounded-full border border-white/10 pointer-events-none shadow-[inset_0_0_15px_rgba(0,0,0,0.5)]"></div>
+                                <div class="absolute w-4 h-4 border-2 border-white rounded-full shadow-[0_0_8px_rgba(0,0,0,0.8)] z-10" style="top: 15%; left: 80%; transform: translate(-50%, -50%);"></div>
+                            </div>
+
+                            <div class="w-full">
+                                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4 text-left">Quick Presets</p>
+                                <div class="flex flex-wrap justify-start gap-4">
+                                    <div class="w-6 h-6 rounded-full bg-[#ef4444] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#f97316] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#eab308] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#22c55e] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#3b82f6] cursor-pointer border-2 border-white shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all scale-110"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#a855f7] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#ec4899] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#ffffff] cursor-pointer border-2 border-transparent hover:border-white/50 transition-all"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (index === 3) {
+            html = `<div class="h-[80px] flex flex-col justify-center items-center"><p class="text-xs font-black italic tracking-widest text-zinc-500 uppercase">System Ready</p></div>`;
+        }
+        drawerContent.innerHTML = html;
+    }
+
+    function switchPrev(e) { if (e) e.stopPropagation(); let idx = profiles.findIndex(p => p.id === activeProfileId); if (idx > 0) { activeProfileId = profiles[idx - 1].id; autoSave(); renderKeyboard(); renderHTML(0); } }
+    function switchNext(e) { if (e) e.stopPropagation(); let idx = profiles.findIndex(p => p.id === activeProfileId); if (idx < profiles.length - 1) { activeProfileId = profiles[idx + 1].id; autoSave(); renderKeyboard(); renderHTML(0); } }
+    function editProfileName(id, e) { e.stopPropagation(); const span = document.getElementById(`name-${id}`); if (!span) return; span.contentEditable = "true"; span.focus(); const range = document.createRange(); range.selectNodeContents(span); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); const saveEdit = () => { span.contentEditable = "false"; const newName = span.innerText.trim(); const p = profiles.find(profile => profile.id === id); if (p && newName) { p.name = newName; autoSave(); } else if (p) { span.innerText = p.name; } span.removeEventListener('blur', saveEdit); span.removeEventListener('keydown', keydownHandler); }; const keydownHandler = (event) => { if (event.key === 'Enter') { event.preventDefault(); saveEdit(); } }; span.addEventListener('blur', saveEdit); span.addEventListener('keydown', keydownHandler); }
+    function addNewProfile(e) { if (profiles.length >= 5) { alert('配置槽位已满 (Max 5)。请删除后重试。'); return; } const id = 'p_' + Date.now(); profiles.push({ id, name: 'Profile 0' + (profiles.length + 1), layout: JSON.parse(JSON.stringify(RAW_LAYOUT)) }); activeProfileId = id; autoSave(); renderKeyboard(); renderHTML(0); }
+    function triggerImport(e) { if (profiles.length >= 5) { alert('配置槽位已满 (Max 5)。请删除后重试。'); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (readEvent) => { try { const data = JSON.parse(readEvent.target.result); if (data && data.layout) { const newId = 'p_' + Date.now(); profiles.push({ id: newId, name: (data.name || 'Imported Profile'), layout: data.layout }); activeProfileId = newId; autoSave(); renderKeyboard(); renderHTML(0); } } catch(e){} }; reader.readAsText(file); }; input.click(); }
+
+    function deleteProfile(id, e) {
+        e.stopPropagation();
+        if (id === 'default') return;
+        const card = document.getElementById(`card-${id}`);
+        if(card) { card.style.transition = 'all 0.3s'; card.style.opacity = '0'; card.style.transform = 'scale(0.95)'; }
+        setTimeout(() => {
+            let idx = profiles.findIndex(p => p.id === id);
+            profiles = profiles.filter(p => p.id !== id);
+            if (activeProfileId === id) activeProfileId = profiles[Math.max(0, idx - 1)].id;
+            autoSave(); renderKeyboard();
+            if (activeNav === 0) renderHTML(0);
+        }, 200);
+    }
+
+    function downloadProfile(id, e) { e.stopPropagation(); const p = profiles.find(p => p.id === id); const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(p, null, 2)); const a = document.createElement('a'); a.href = data; a.download = (p.name || 'Profile') + ".json"; a.click(); }
+
+    function applyRemap(val) {
+        if (selectedKey) {
+            const idx = selectedKey.dataset.index, p = getActiveProfile();
+            let count = 0;
+            for(let r=0; r<p.layout.length; r++) {
+                for(let c=0; c<p.layout[r].length; c++) {
+                    if (typeof p.layout[r][c] === 'string') {
+                        if (count == idx) {
+                            lastRemapHistory = { r, c, oldVal: p.layout[r][c], newVal: val, keyEl: selectedKey, profileId: p.id };
+                            p.layout[r][c] = val;
+                            break;
+                        }
+                        count++;
+                    }
+                }
+            }
+            selectedKey.querySelector('span').innerHTML = val.replace('\n', '<br>');
+            selectedKey.dataset.name = val.replace('\n', ' ');
+
+            const targetTitle = document.getElementById('target-key-display');
+            if (targetTitle) targetTitle.innerText = val.replace('\n', ' ');
+
+            const undoBtn = document.getElementById('undo-btn');
+            if (undoBtn) {
+                undoBtn.classList.remove('opacity-0', 'pointer-events-none');
+                undoBtn.classList.add('opacity-100');
+            }
+
+            autoSave();
+        }
+    }
+
+    function undoRemap(e) {
+        if (e) e.stopPropagation();
+        if (!lastRemapHistory) return;
+        const {r, c, oldVal, keyEl, profileId} = lastRemapHistory;
+        const p = profiles.find(pr => pr.id === profileId);
+        if (p) {
+            p.layout[r][c] = oldVal;
+            keyEl.querySelector('span').innerHTML = oldVal.replace('\n', '<br>');
+            keyEl.dataset.name = oldVal.replace('\n', ' ');
+
+            if (selectedKey === keyEl) {
+                const targetTitle = document.getElementById('target-key-display');
+                if(targetTitle) targetTitle.innerText = oldVal.replace('\n', ' ');
+            }
+            autoSave();
+        }
+        const undoBtn = document.getElementById('undo-btn');
+        if (undoBtn) {
+            undoBtn.classList.add('opacity-0', 'pointer-events-none');
+            undoBtn.classList.remove('opacity-100');
+        }
+        lastRemapHistory = null;
+    }
+
+    function selectKey(el, name) {
+        if (selectedKey) selectedKey.classList.remove('key-selected');
+        selectedKey = el; el.classList.add('key-selected');
+
+        if (activeNav === 1) {
+            const targetTitle = document.getElementById('target-key-display');
+            if (targetTitle) targetTitle.innerText = name;
+        } else if (activeNav === 2) {
+            // 在灯光模式只高亮，不切菜单！
+        } else {
+            handleNav(null, 1);
+        }
+    }
+
+    function renderKeyboard() {
+        canvas.innerHTML = ''; const p = getActiveProfile(), UNIT = Math.max(42, Math.min(62, Math.min(window.innerWidth / 21, window.innerHeight / 14))), GAP = 8; let currentY = 0, maxW = 0, keyIdx = 0;
+        p.layout.forEach(row => {
+            let currentX = 0, nextW = 1; row.forEach(item => {
+                if (typeof item === 'object') { if (item.x) currentX += item.x; if (item.y) currentY += item.y; if (item.w) nextW = item.w; }
+                else { const key = document.createElement('div'); key.className = 'key-cap absolute uppercase'; key.dataset.index = keyIdx++; key.dataset.name = item.replace('\n', ' '); key.style.fontSize = (UNIT * 0.18) + 'px'; Object.assign(key.style, { width: (nextW * UNIT - GAP) + 'px', height: (UNIT - GAP) + 'px', left: (currentX * UNIT) + 'px', top: (currentY * UNIT) + 'px' }); key.innerHTML = `<span>${item.replace('\n', '<br>')}</span>`; key.onclick = (e) => { e.stopPropagation(); selectKey(key, item.replace('\n', ' ')); }; canvas.appendChild(key); currentX += nextW; nextW = 1; if (currentX > maxW) maxW = currentX; }
+            }); currentY += 1;
+        }); canvas.style.width = (maxW * UNIT) + 'px'; canvas.style.height = (currentY * UNIT) + 'px'; syncHeader();
+    }
+
+    function moveHighlight(index, btn) { highlightPill.style.left = btn.offsetLeft + 'px'; highlightPill.style.width = btn.offsetWidth + 'px'; if (index === 0) highlightPill.style.borderRadius = '1.5rem 0 0 1.5rem'; else if (index === 3) highlightPill.style.borderRadius = '0 1.5rem 1.5rem 0'; else highlightPill.style.borderRadius = '12px'; highlightPill.style.opacity = '1'; highlightPill.style.transform = 'scale(1)'; }
+
+    document.getElementById('connect-trigger').onclick = () => {
+        document.getElementById('entry').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('entry').style.display = 'none';
+            renderKeyboard();
+            document.getElementById('kb-stage').classList.add('appear');
+            setTimeout(() => { document.getElementById('dock-bar').classList.add('appear'); }, 300);
+        }, 700);
+    };
+</script>
+</body>
+</html>
