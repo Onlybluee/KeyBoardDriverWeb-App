@@ -117,29 +117,46 @@
         body.light-mode .text-zinc-500 { color: #94a3b8 !important; }
 
         /* 导出导入新建按钮高亮：仅文字变黑 */
-        body.light-mode .text-zinc-400:hover { color: #000000 !important; }
+        body.light-mode button.text-zinc-400:hover { color: #000000 !important; }
         /* 删除按钮红色高亮 */
         body.light-mode .hover\:text-red-500:hover { color: #ef4444 !important; }
 
         /* 默认标签：背景减淡 */
         body.light-mode .bg-zinc-800\/40 { background-color: rgba(0,0,0,0.04) !important; color: #64748b !important;}
-        body.light-mode .border-white\/10, body.light-mode .border-white\/5 { border-color: rgba(255,255,255,0.8) !important; }
 
-        /* 键盘键帽白天模式修正 */
+        /* 修复白天模式分页框显隐与边框 */
+        body.light-mode .border-white\/10 { border-color: rgba(0,0,0,0.1) !important; }
+        body.light-mode .border-white\/5 { border-color: rgba(0,0,0,0.06) !important; }
+
+        /* 键盘键帽白天模式修正：删除上方横线 */
         body.light-mode .key-cap {
             background: rgba(255, 255, 255, 0.9);
             border: 1px solid #ffffff;
-            border-top: 1px solid #ffffff !important; /* 核心：删除上方横线 */
+            border-top: none !important; /* 彻底删除横线 */
             box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
             color: #64748b;
         }
-        body.light-mode .key-cap:hover { background: #fff !important; color: var(--accent) !important; border-color: var(--accent) !important; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important; }
-        body.light-mode .key-cap.key-selected, body.light-mode .key-cap.key-selected:hover { background: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important; }
+        body.light-mode .key-cap:hover { background: #fff !important; color: var(--accent) !important; border: 1px solid var(--accent) !important; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important; }
+        body.light-mode .key-cap.key-selected, body.light-mode .key-cap.key-selected:hover { background: var(--accent) !important; color: #fff !important; border: 1px solid var(--accent) !important; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important; }
 
         body.light-mode .dock-item { color: #64748b; }
         body.light-mode .dock-item:hover { color: #0f172a !important; text-shadow: 0 0 10px #fff !important; }
         body.light-mode .dock-item.active { color: var(--accent) !important; text-shadow: none !important; }
         body.light-mode .profile-card { background: rgba(255,255,255,0.7); border-color: var(--accent) !important; box-shadow: 0 8px 24px rgba(59,130,246,0.15); }
+
+        /* 修复白天模式下级菜单按钮不可见问题 */
+        body.light-mode .key-option {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.1); /* 显影边框 */
+            color: #475569;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+        }
+        body.light-mode .key-option:hover { background: var(--accent); color: #fff !important; border-color: var(--accent); }
+
+        /* 克制且同步的白天模式容器阴影 */
+        body.light-mode #sub-drawer { box-shadow: 0 12px 30px rgba(0,0,0,0.08); border: 1px solid #ffffff; }
+        body.light-mode #kb-stage { box-shadow: 0 12px 30px rgba(0,0,0,0.08); border: 1px solid #ffffff; }
+        body.light-mode .dock-container { box-shadow: 0 8px 20px rgba(0,0,0,0.06); border: 1px solid #ffffff; }
 
         /* 灯光选中修正 */
         body.light-mode .\!text-white { color: #0f172a !important; }
@@ -377,7 +394,7 @@
             html = `
                 <div class="h-[120px] flex flex-col justify-center">
                     <div class="flex justify-between items-center mb-6 px-2">
-                        <div class="flex items-center gap-6">
+                        <div class="flex-1 flex items-center gap-6">
                             <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">${t('profMgt')}</p>
                             <div class="flex gap-4">
                                 <button onclick="downloadProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">${t('export')}</button>
@@ -385,7 +402,7 @@
                                 <button onclick="addNewProfile(event)" class="text-[10px] font-bold text-zinc-400 hover:text-white transition-colors">${t('new')}</button>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 border border-white/10 group transition-colors hover:bg-white/10 pr-2">
+                        <div class="w-[100px] flex justify-center items-center gap-2 bg-white/5 rounded-full py-1.5 border border-white/10 group transition-colors hover:bg-white/10">
                             <button ${isPrevDisabled ? '' : 'onclick="switchPrev(event)"'} class="w-6 h-6 flex items-center justify-center ${isPrevDisabled ? 'text-zinc-800 cursor-not-allowed' : 'text-zinc-600 hover:!text-white cursor-pointer'} transition-colors">
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="5" d="M15 19l-7-7 7-7"></path></svg>
                             </button>
@@ -401,7 +418,7 @@
                                 <span id="name-${p.id}" onclick="if(this.isContentEditable) event.stopPropagation();" class="text-sm font-extrabold outline-none focus:text-blue-400 focus:border-b focus:border-blue-400 border-b border-transparent transition-all text-white">${p.name}</span>
                                 ${p.id !== 'default' ? `<svg onclick="editProfileName('${p.id}', event)" class="w-3.5 h-3.5 text-zinc-600 hover:text-blue-400 transition-colors cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>` : ''}
                             </div>
-                            <div class="flex items-center gap-4">
+                            <div class="w-20 flex justify-end">
                                 ${p.id !== 'default' ? `<button onclick="deleteProfile('${p.id}', event)" class="text-[10px] font-bold text-zinc-400 hover:text-red-500 tracking-wider transition-colors">${t('del')}</button>` : `<span class="text-[10px] font-bold text-zinc-500 tracking-wider select-none bg-zinc-800/40 px-2.5 py-1 rounded-md border border-white/5">${t('def')}</span>`}
                             </div>
                         </div>
